@@ -14,10 +14,5 @@ wrap_function.o:wrap_function.c common.h
 database.o:database.c database.h
 	gcc -c database.c
 
-client:client.o 
-	gcc -o client client.o 
-client.o:client.c 
-	gcc -c client.c
-
 clean:
 	rm *.o

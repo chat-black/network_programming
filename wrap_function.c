@@ -55,8 +55,12 @@ void Read(int sockfd,char *buf,size_t len,char *id)
 	{
 	    if(errno==EINTR)
 		continue;
-	    perror("read error");
-	    exit(1);
+	    else
+	    {
+		perror("read error");
+		User_offline_fun(id);
+		pthread_exit(NULL);
+	    }
 	}
 	len-=ret;
 	buf+=ret;
@@ -65,8 +69,7 @@ void Read(int sockfd,char *buf,size_t len,char *id)
     if(sum==0)
     {
 	close(sockfd);
-	if(id[0]!=NETWORK_FAIL && id !=NULL)
-	    User_offline_fun(id);
+	User_offline_fun(id);
 	pthread_exit(NULL);
     }
 }
@@ -80,8 +83,20 @@ void Write(int sockfd,const char *buf,size_t len)
 	{
 	    if(errno==EINTR)
 		continue;
-	    perror("write error");
-	    exit(1);
+	    //else if(errno==
+	    else
+	    {
+		char temp[DATA_LEN];
+		sprintf(temp,"update user_message set log_in=0 where sockfd=%d",sockfd);
+		perror("write error");
+		if (mysql_query(conn, temp)) 
+		{
+		    printf("%s\n",temp);
+		    printf("Error %u: %s\n", mysql_errno(conn), mysql_error(conn));
+		    exit(1);
+		}
+		pthread_exit(NULL);
+	    }
 	}
 	buf+=ret;
 	len-=ret;
